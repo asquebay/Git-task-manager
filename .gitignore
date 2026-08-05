@@ -1,0 +1,43 @@
+# Pixi environments
+.pixi/*
+
+# Python
+*$py.class
+*.egg
+*.egg-info/
+*.py[cod]
+*.so
+.Python
+.eggs/
+.installed.cfg
+__pycache__/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.kate-swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.spec
+build/
+dist/
+
+# Other
+temp/

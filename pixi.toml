@@ -1,0 +1,20 @@
+[workspace]
+authors = ["asquebay <baymaxbay23@gmail.com>"]
+channels = ["conda-forge"]
+description = "Console utility for managing tasks in Git projects"
+name = "Git-task-manager"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+# Сборка исполняемого файла PyInstaller
+build = "pyinstaller --onefile --name git-task --paths . src/main.py"
+
+# Запуск в режиме разработки
+dev = "python src/main.py"
+
+[dependencies]
+python = ">3.10,<3.12"
+rich = ">=13.0.0"
+pyinstaller = ">=6.0.0"
+prompt-toolkit = ">=3.0.53,<4"
