@@ -63,7 +63,7 @@ jobs:
             artifacts/git-task-macos-intel/git-task-macos-intel
             install.sh
             install.bat
-          draft: false
+          draft: true
           prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
