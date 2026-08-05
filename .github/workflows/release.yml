@@ -1,4 +1,7 @@
 name: Build and Release
+# Права на запись для создания релизов
+permissions:
+  contents: write
 on:
   push:
     tags:
