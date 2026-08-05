@@ -3,12 +3,12 @@ authors = ["asquebay <baymaxbay23@gmail.com>"]
 channels = ["conda-forge"]
 description = "Console utility for managing tasks in Git projects"
 name = "Git-task-manager"
-platforms = ["linux-64"]
+platforms = ["linux-64", "win-64", "osx-64", "osx-arm64"]
 version = "0.1.0"
 
 [tasks]
-# Сборка исполняемого файла PyInstaller
-build = "pyinstaller --onefile --name git-task --paths . src/main.py"
+# Сборка исполняемого файла PyInstaller в корень проекта
+build = "pyinstaller --clean --onefile --log-level=INFO --name 'git-task' --paths . --distpath . src/main.py"
 
 # Запуск в режиме разработки
 dev = "python src/main.py"

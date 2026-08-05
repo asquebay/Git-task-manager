@@ -38,6 +38,8 @@ Thumbs.db
 *.spec
 build/
 dist/
+git-task
+git-task.exe
 
 # Other
 temp/
