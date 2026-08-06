@@ -19,6 +19,55 @@ class InteractiveEditor:
     """Interactive task editor in terminal"""
 
     @staticmethod
+    def _create_task_preview(
+        content: str, max_chars: int = 1000, max_lines: int = 20
+    ) -> str:
+        """
+        Создаёт превью таски с ограничением по символам и строкам
+
+        Args:
+            content: полное содержимое таски
+            max_chars: максимальное количество символов
+            max_lines: максимальное количество строк
+
+        Returns:
+            превью таски (с "..." в конце если обрезано)
+        """
+        if not content:
+            return ""
+
+        # Проверяем базовое условие: если текст укладывается в лимиты,
+        # то возвращаем его целиком без добавления "..."
+        lines = content.split("\n")
+        if len(content) <= max_chars and len(lines) <= max_lines:
+            return content
+
+        result_lines = []
+        current_chars = 0
+
+        for line in lines:
+            # Проверяем лимит по строкам (учитывая будущую строку)
+            if len(result_lines) >= max_lines:
+                break
+
+            # Длина строки + символ переноса (если это не первая строка)
+            line_cost = len(line) + (1 if result_lines else 0)
+
+            # Проверяем, не превысим ли лимит символов
+            if current_chars + line_cost > max_chars:
+                # Сколько символов осталось до лимита
+                remaining_chars = max_chars - current_chars - (1 if result_lines else 0)
+                if remaining_chars > 0:
+                    result_lines.append(line[:remaining_chars])
+                break
+
+            result_lines.append(line)
+            current_chars += line_cost
+
+        # Собираем результат и добавляем "..." в конце
+        return "\n".join(result_lines) + "..."
+
+    @staticmethod
     def edit_task(
         initial_content: str, status: str, allow_status_change: bool = False
     ) -> tuple[str, str]:
@@ -106,13 +155,22 @@ class InteractiveEditor:
         )
 
     @staticmethod
-    def select_status_and_edit(initial_content: str = "") -> tuple[str, str]:
+    def select_status_and_edit(
+        initial_content: str = "", initial_status: str = "TODO"
+    ) -> tuple[str, str]:
         """
         Two-stage editor: first select status with arrows, then edit content
 
+        Args:
+            initial_content: предзаполненное содержимое таски
+            initial_status: статус, который будет выбран по умолчанию
+
         Returns: (content, status)
         """
-        # Этап 1: выбор статуса
+        # Создаём превью таски для отображения на первом этапе
+        task_preview = InteractiveEditor._create_task_preview(initial_content)
+
+        # Этап 1: выбор статуса с превью таски
         console.clear()
         console.print("[bold cyan]Task Editor - Select Status[/bold cyan]")
         console.print("=" * 40)
@@ -123,11 +181,18 @@ class InteractiveEditor:
         console.print()
 
         statuses = ["TODO", "DONE", "UNLABELED"]
-        current_status_idx = 0
+
+        # Устанавливаем начальный статус на основе initial_status
+        if initial_status in statuses:
+            current_status_idx = statuses.index(initial_status)
+        else:
+            current_status_idx = 0
 
         # Key bindings для выбора статуса
         kb = KeyBindings()
-        selected_status = [statuses[0]]  # используем список для изменяемости
+        selected_status = [
+            statuses[current_status_idx]
+        ]  # используем список для изменяемости
 
         @kb.add("up")
         @kb.add("down")
@@ -155,22 +220,35 @@ class InteractiveEditor:
             """Accept on Enter"""
             event.app.exit(result=selected_status[0])
 
-        # Создаём интерактивный контрол для отображения статуса
+        # Создаём интерактивный контрол для отображения статуса + превью
         def get_status_text():
             status = selected_status[0]
+            # Формируем статус с превью таски
             if status == "TODO":
-                return FormattedText([("ansiyellow bold", "TODO: ")])
+                status_part = [("ansiyellow bold", "TODO: ")]
             elif status == "DONE":
-                return FormattedText([("ansigreen bold", "DONE: ")])
+                status_part = [("ansigreen bold", "DONE: ")]
             else:
-                return FormattedText([("ansired bold", "UNLABELED: ")])
+                status_part = [("ansired bold", "UNLABELED: ")]
+
+            # Добавляем превью таски обычным текстом
+            if task_preview:
+                status_part.append(("", task_preview))
+
+            return FormattedText(status_part)
 
         status_control = FormattedTextControl(
             text=get_status_text,
             focusable=True,
         )
 
-        layout = Layout(Window(content=status_control, height=1))
+        layout = Layout(
+            Window(
+                content=status_control,
+                wrap_lines=True,  # визуальный перенос длинных строк
+                dont_extend_height=True,  # окно занимает ровно столько строк, сколько позволяют визуальные границы терминала
+            )
+        )
         app = Application(layout=layout, key_bindings=kb, full_screen=False)
 
         try:

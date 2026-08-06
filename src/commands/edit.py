@@ -29,8 +29,10 @@ def handle_edit(args: list):
         console.print(f"[red]error:[/red] task not found: {task_id}", style="bold")
         sys.exit(1)
 
-    # Открываем редактор
-    content, status = InteractiveEditor.edit_task(task.content, task.status)
+    # Открываем двухэтапный редактор с текущим содержимым и статусом
+    content, status = InteractiveEditor.select_status_and_edit(
+        initial_content=task.content, initial_status=task.status
+    )
 
     # Обновляем таску
     TaskManager.update_task(task_id, content, status)

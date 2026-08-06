@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # 2. Проверка на наличие .git
 if [ ! -d ".git" ]; then
-    echo "Error: Current directory is not a git repository."
+    echo "error: Current directory is not a git repository."
     echo 'Please initialize a repository with "git init -b main" or move to an existing one.'
     exit 1
 fi
@@ -55,12 +55,12 @@ if [ "$FOUND_COUNT" -eq 1 ]; then
     check_alias_and_exit
 # Если найдено НЕСКОЛЬКО файлов — выводим ошибку
 elif [ "$FOUND_COUNT" -gt 1 ]; then
-    echo "Error: Multiple release files found in '$SCRIPT_DIR': $FOUND_LIST"
+    echo "error: Multiple release files found in '$SCRIPT_DIR': $FOUND_LIST"
     echo "Please delete the inappropriate releases and keep only the one matching your OS."
     exit 1
 fi
 
 # 5. Ошибка, если ни один из файлов не найден
-echo "Error: No release files ('git-task-linux', 'git-task-macos-arm64', or 'git-task-macos-intel') found in '$SCRIPT_DIR'."
+echo "error: No release files ('git-task-linux', 'git-task-macos-arm64', or 'git-task-macos-intel') found in '$SCRIPT_DIR'."
 echo "Please download the appropriate release from https://github.com/asquebay/Git-task-manager/releases and follow the README instructions."
 exit 1

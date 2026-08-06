@@ -1,36 +1,36 @@
 @echo off
 chcp 65001 > nul
 
-:: 1. Определяем путь к папке, где лежит сам скрипт
+REM 1. Get script directory path
 set "SCRIPT_DIR=%~dp0"
 
-:: 2. Проверка на наличие .git
+REM 2. Check for .git directory
 if not exist .git\ (
-    echo Error: Current directory is not a git repository.
+    echo error: Current directory is not a git repository.
     echo Please initialize a repository with "git init -b main" or move to an existing one.
     goto end
 )
 
-:: 3. Проверка файла в .git
+REM 3. Check if target file already exists in .git
 if exist ".git\git-task.exe" (
     goto check_alias_and_exit
 )
 
-:: 4. Проверка файла в папке со скриптом (дистрибутив)
+REM 4. Check if source file exists in script directory
 set "DIST_FILE=%SCRIPT_DIR%git-task-windows.exe"
 if exist "%DIST_FILE%" (
-    :: 4.1. Копирование и переход к проверке алиаса
+    REM 4.1. Copy file and proceed to alias validation
     copy /Y "%DIST_FILE%" ".git\git-task.exe" > nul
     goto check_alias_and_exit
 )
 
-:: 5. Ошибка, если файл не найден
-echo Error: File './git-task-windows.exe' not found in '%SCRIPT_DIR%'.
+REM 5. Error if file not found
+echo error: File './git-task-windows.exe' not found in '%SCRIPT_DIR%'.
 echo Please download the release from https://github.com/asquebay/Git-task-manager/releases and follow the README instructions.
 goto end
 
 :check_alias_and_exit
-:: Ищем строку task в конфигурационном файле .git/config
+REM 6. Search for alias in .git/config
 findstr /C:"task = !.git/git-task.exe" .git\config > nul 2>&1
 if %errorlevel% equ 0 (
     echo Git task manager is already initialized in this project.
